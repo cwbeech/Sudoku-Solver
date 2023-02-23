@@ -32,15 +32,12 @@ namespace Ksu.Cis300.SudokuSolver
         /// <summary>
         /// A bool[,] used to track the values used in each row.
         /// </summary>
-        private static bool[,] _valuesUsedInRow = new bool[_numberOfRowsAndColumnsInPuzzle, 
-                                                           _numberOfRowsAndColumnsInPuzzle+1];
+        private static bool[,] _valuesUsedInRow;
 
         /// <summary>
         /// A bool[,,] used to track the values used in each block.
         /// </summary>
-        private static bool[,,] _valuesUsedInBlock = new bool[_numberOfRowsAndColumnsInBlock, 
-                                                              _numberOfRowsAndColumnsInBlock, 
-                                                              _numberOfRowsAndColumnsInBlock * _numberOfRowsAndColumnsInBlock + 1];
+        private static bool[,,] _valuesUsedInBlock;
 
         /// <summary>
         /// A DoulbyLinkedListCell[] used to store the empty puzzle locations in each row.
@@ -60,17 +57,17 @@ namespace Ksu.Cis300.SudokuSolver
         /// <summary>
         /// A Stack<DoublyLinkedListCell> used to contain the cells removed from the lists of unused values.
         /// </summary>
-        private static Stack<DoublyLinkedListCell> _cellsRemovedFromListsUnused = new Stack<DoublyLinkedListCell>();
+        private static Stack<DoublyLinkedListCell> _cellsRemovedFromListsUnused;
 
         /// <summary>
         /// A DoublyLinkedListCell used to refer to the cell giving the empty puzzle location to be filled next.
         /// </summary>
-        private static DoublyLinkedListCell _nextEmptyLocation = new DoublyLinkedListCell();
+        private static DoublyLinkedListCell _currentLocation;
 
         /// <summary>
         /// A DoublyLinkedListCell used to refer to the cell containing the next value to be tried.
         /// </summary>
-        private static DoublyLinkedListCell _nextTriedValue = new DoublyLinkedListCell();
+        private static DoublyLinkedListCell _nextValue;
 
         /// <summary>
         /// Removes a DoulbyLinkedListCell from a DoublyLinkedList.
@@ -199,19 +196,164 @@ namespace Ksu.Cis300.SudokuSolver
             return result;
         }
 
-
-        private static bool InitializeOneRow(int row) //stopped at 7.2.9
+        /// <summary>
+        /// Initialized one row of the puzzle
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns>AN int representing the index of the row being initialized</returns>
+        private static bool InitializeOneRow(int row)
         {
             DoublyLinkedListCell EmptyHeader = new DoublyLinkedListCell();
-            for (int i = 0; i < _emptyPuzzleLocations.Length; i++)
+            _emptyPuzzleLocations[row] = EmptyHeader;
+            _unusedValues[row] = GetListOfAllPuzzleValues();
+
+            for (int i = 0; i < _puzzle.GetLength(1); i++)
             {
-                DoublyLinkedListCell temp = _emptyPuzzleLocations[i];
-                InsertCellIntoList(temp, EmptyHeader);
+                if (_puzzle[row, i] == 0)
+                {
+                    DoublyLinkedListCell temp = new DoublyLinkedListCell();
+                    temp.Data = _puzzle[row, i];
+                    InsertCellIntoList(temp, EmptyHeader);
+                }
+                else
+                {
+                    if (!(CanBeLegallyPlacedAtLocation(row, i, _puzzle[row, i]) || RemoveValueFromList(_puzzle[row, i], EmptyHeader)))
+                    {
+                        return false;
+                    }
+                    RecordStatusOfValueInBoolArrays(row, i, _puzzle[row, i], true);
+                }
             }
-            DoublyLinkedListCell unused = GetListOfAllPuzzleValues();
+            return true;
+        }
 
+        /// <summary>
+        /// Initializes all fields except for last two used in backtracking.
+        /// </summary>
+        /// <param name="puzzle">The puzzle to be solved.</param>
+        /// <returns>Bool representing whether the initialization passed.</returns>
+        private static bool InitializeFields(int[,] puzzle)
+        {
+            _puzzle = puzzle;
+            _numberOfRowsAndColumnsInPuzzle = puzzle.GetLength(0);
+            _numberOfRowsAndColumnsInBlock = (int)Math.Sqrt((double)puzzle.GetLength(0));
+            _valuesUsedInRow = new bool[_numberOfRowsAndColumnsInPuzzle, _numberOfRowsAndColumnsInPuzzle + 1];
+            _valuesUsedInBlock = new bool[_numberOfRowsAndColumnsInBlock, _numberOfRowsAndColumnsInBlock, _numberOfRowsAndColumnsInPuzzle + 1];
+            _emptyPuzzleLocations = new DoublyLinkedListCell[_numberOfRowsAndColumnsInPuzzle];
+            _unusedValues = new DoublyLinkedListCell[_numberOfRowsAndColumnsInPuzzle];
+            for (int i = 0; i < _numberOfRowsAndColumnsInPuzzle; i++)
+            {
+                if (!InitializeOneRow(i))
+                {
+                    return false;
+                }
+            }
+            _cellsRemovedFromListsUnused = new Stack<DoublyLinkedListCell>();
+            return true;
+        }
 
+        /// <summary>
+        /// Advances current row.
+        /// </summary>
+        /// <returns></returns>
+        private static bool AdvanceToNextRow() //needs fixing
+        {
+            _currentRow++;
+            if (_currentRow >= _numberOfRowsAndColumnsInPuzzle) //advancing the current row field to the next row
+            {
+                return false;
+            }
+            _currentLocation = _emptyPuzzleLocations[_currentRow].Next; //setting the current location to the first empty location of the new row.
+            _nextValue = _unusedValues[_currentRow].Next; //setting the next value to the first unused value on the mew row.
+            return true;
+        }
+
+        /// <summary>
+        /// Initiates Bakctrack algorithm. If false solution doesn't exist.
+        /// </summary>
+        /// <returns>A bool representing whether or not the backtracking worked.</returns>
+        private static bool Backtrack()
+        {
+            while(_cellsRemovedFromListsUnused.Count > 0)
+            {
+                if (_currentLocation.Previous == _emptyPuzzleLocations[_currentRow])
+                {
+                    _currentRow--;
+                    _currentLocation = _emptyPuzzleLocations[_currentRow];
+                }
+                else
+                {
+                    _currentLocation = _currentLocation.Previous;
+                    DoublyLinkedListCell topCell = _cellsRemovedFromListsUnused.Pop();
+                    RemoveValueFromList(_currentLocation.Data, _currentLocation);
+                    RecordStatusOfValueInBoolArrays(_currentRow, _currentLocation.Data, topCell.Data, false);
+                    RestoreRemovedCell(topCell);
+                    if (topCell != _unusedValues[_currentRow])
+                    {
+                        _nextValue = topCell.Next;
+                        return true;
+                    }
+                }
+            }
             return false;
+        }
+
+        /// <summary>
+        /// Uses the next value in the current location.
+        /// </summary>
+        private static void UseNextValue()
+        {
+            if (CanBeLegallyPlacedAtLocation(_currentRow, _currentLocation.Data, _nextValue.Data))
+            {
+                DoublyLinkedListCell temp = _nextValue;
+                RemoveCellFromList(_nextValue);
+                _cellsRemovedFromListsUnused.Push(temp);
+                _currentLocation = temp;
+                _puzzle[_currentRow, _currentLocation.Data] = temp.Data;
+                RecordStatusOfValueInBoolArrays(_currentRow, _currentLocation.Data, temp.Data, true); //what to use for column.
+                _nextValue = _unusedValues[_currentRow].Next;
+                _currentLocation = _emptyPuzzleLocations[_currentRow].Next;
+            }
+            else
+            {
+                _nextValue = _nextValue.Next;
+            }
+        }
+
+        /// <summary>
+        /// Solves a puzzle.
+        /// </summary>
+        /// <param name="puzzle">The puzzle being solved.</param>
+        /// <returns>A bool representing whether the puzzle was successfully solved.</returns>
+        public static bool Solve(int[,] puzzle)
+        {
+            if (!InitializeFields(puzzle))
+            {
+                return false;
+            }
+            _currentRow = -1;
+            AdvanceToNextRow();
+            while (true)
+            {
+                if (_currentLocation == _emptyPuzzleLocations[_currentRow])
+                {
+                    if (!AdvanceToNextRow())
+                    {
+                        return true;
+                    }
+                }
+                else if (_nextValue == _unusedValues[_currentRow])
+                {
+                    if (!Backtrack())
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    UseNextValue();
+                }
+            }
         }
     }
 }

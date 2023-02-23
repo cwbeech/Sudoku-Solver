@@ -1,6 +1,6 @@
 ﻿namespace Ksu.Cis300.SudokuSolver
 {
-    partial class Form1
+    partial class UserInterface
     {
         /// <summary>
         /// Required designer variable.
@@ -64,18 +64,21 @@
             this.new4x4ToolStripMenuItem.Name = "new4x4ToolStripMenuItem";
             this.new4x4ToolStripMenuItem.Size = new System.Drawing.Size(182, 34);
             this.new4x4ToolStripMenuItem.Text = "New 4x4";
+            this.new4x4ToolStripMenuItem.Click += new System.EventHandler(this.new4x4ToolStripMenuItem_Click);
             // 
             // new9x9ToolStripMenuItem
             // 
             this.new9x9ToolStripMenuItem.Name = "new9x9ToolStripMenuItem";
             this.new9x9ToolStripMenuItem.Size = new System.Drawing.Size(182, 34);
             this.new9x9ToolStripMenuItem.Text = "New 9x9";
+            this.new9x9ToolStripMenuItem.Click += new System.EventHandler(this.new9x9ToolStripMenuItem_Click);
             // 
             // solveToolStripMenuItem
             // 
             this.solveToolStripMenuItem.Name = "solveToolStripMenuItem";
             this.solveToolStripMenuItem.Size = new System.Drawing.Size(182, 34);
             this.solveToolStripMenuItem.Text = "Solve";
+            this.solveToolStripMenuItem.Click += new System.EventHandler(this.solveToolStripMenuItem_Click);
             // 
             // uxFlowLayoutPanel1
             // 
@@ -90,7 +93,7 @@
             this.uxFlowLayoutPanel1.TabIndex = 1;
             this.uxFlowLayoutPanel1.WrapContents = false;
             // 
-            // Form1
+            // UserInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -99,8 +102,9 @@
             this.Controls.Add(this.uxMenuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MainMenuStrip = this.uxMenuStrip1;
+            this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Form1";
+            this.Name = "UserInterface";
             this.Text = "Sudoku Solver";
             this.uxMenuStrip1.ResumeLayout(false);
             this.uxMenuStrip1.PerformLayout();
@@ -116,7 +120,7 @@
         private System.Windows.Forms.ToolStripMenuItem new4x4ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem new9x9ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem solveToolStripMenuItem;
-        public System.Windows.Forms.FlowLayoutPanel uxFlowLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel uxFlowLayoutPanel1;
     }
 }
 
