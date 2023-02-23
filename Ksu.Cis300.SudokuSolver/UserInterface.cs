@@ -1,4 +1,7 @@
-﻿using System;
+﻿/* UserInterface.cs
+ * Author: Calvin Beechner
+ */
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -217,8 +220,15 @@ namespace Ksu.Cis300.SudokuSolver
         /// <param name="e"></param>
         private void solveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Solver.Solve(_puzzle);
-            PlaceSolutionInGUI();
+            if (Solver.Solve(_puzzle))
+            {
+                PlaceSolutionInGUI();
+                solveToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show("No solution found.");
+            }
         }
     }
 }

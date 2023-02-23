@@ -76,7 +76,7 @@ namespace Ksu.Cis300.SudokuSolver
         public static void RemoveCellFromList(DoublyLinkedListCell dllc)
         {
             dllc.Previous.Next = dllc.Next; //removes previous's reference to deleted cell
-            dllc.Next.Previous = dllc.Previous.Previous; //removes next's reference to deleted cell
+            dllc.Next.Previous = dllc.Previous; //removes next's reference to deleted cell
         }
 
         /// <summary>
@@ -96,10 +96,9 @@ namespace Ksu.Cis300.SudokuSolver
         /// <param name="second">The DoublyLinkedListCell following the inserted Cell.</param>
         private static void InsertCellIntoList(DoublyLinkedListCell first, DoublyLinkedListCell second)
         {
-            second.Previous.Next = first;
             first.Previous = second.Previous;
-            second.Previous = first;
             first.Next = second;
+            RestoreRemovedCell(first);
         }
 
         /// <summary>
@@ -255,7 +254,7 @@ namespace Ksu.Cis300.SudokuSolver
         /// <summary>
         /// Advances current row.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Bool representing whether or not it successfully advanced.</returns>
         private static bool AdvanceToNextRow() //needs fixing
         {
             _currentRow++;
@@ -285,7 +284,8 @@ namespace Ksu.Cis300.SudokuSolver
                 {
                     _currentLocation = _currentLocation.Previous;
                     DoublyLinkedListCell topCell = _cellsRemovedFromListsUnused.Pop();
-                    RemoveValueFromList(_currentLocation.Data, _currentLocation);
+                    _puzzle[_currentRow, _currentLocation.Data] = 0;
+                    //RemoveValueFromList(_currentLocation.Data, _currentLocation);
                     RecordStatusOfValueInBoolArrays(_currentRow, _currentLocation.Data, topCell.Data, false);
                     RestoreRemovedCell(topCell);
                     if (topCell != _unusedValues[_currentRow])
@@ -308,11 +308,10 @@ namespace Ksu.Cis300.SudokuSolver
                 DoublyLinkedListCell temp = _nextValue;
                 RemoveCellFromList(_nextValue);
                 _cellsRemovedFromListsUnused.Push(temp);
-                _currentLocation = temp;
                 _puzzle[_currentRow, _currentLocation.Data] = temp.Data;
                 RecordStatusOfValueInBoolArrays(_currentRow, _currentLocation.Data, temp.Data, true); //what to use for column.
                 _nextValue = _unusedValues[_currentRow].Next;
-                _currentLocation = _emptyPuzzleLocations[_currentRow].Next;
+                _currentLocation = _currentLocation.Next;
             }
             else
             {
