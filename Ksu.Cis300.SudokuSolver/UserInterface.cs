@@ -111,7 +111,6 @@ namespace Ksu.Cis300.SudokuSolver
 
         }
 
-
         /// <summary>
         /// Adds the textBoxes.
         /// </summary>
@@ -193,7 +192,6 @@ namespace Ksu.Cis300.SudokuSolver
         {
             StartNewPuzzle(_numberOfRowColumnsInBlockNine);
         }
-
 
         /// <summary>
         /// Places a solution into the GUI.

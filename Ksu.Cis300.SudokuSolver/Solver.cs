@@ -108,21 +108,6 @@ namespace Ksu.Cis300.SudokuSolver
         /// <returns>DoublyLinkedListCell containing all valid values.</returns>
         private static DoublyLinkedListCell GetListOfAllPuzzleValues()
         {
-            /*
-            DoublyLinkedListCell result = new DoublyLinkedListCell();
-            result.Data = 9;
-            for (int i = 8; i >= _numberOfRowsAndColumnsInPuzzle; i--)
-            {
-                DoublyLinkedListCell temp = result;
-                DoublyLinkedListCell cell = new DoublyLinkedListCell();
-                cell.Data = i;
-                cell.Next = temp;
-                temp.Previous = cell;
-                result = cell;
-            }
-            return result;
-            //this is wrong.
-            */
             DoublyLinkedListCell header = new DoublyLinkedListCell();
             for (int i = 1; i <= _numberOfRowsAndColumnsInPuzzle; i++)
             {
@@ -184,12 +169,9 @@ namespace Ksu.Cis300.SudokuSolver
         /// <returns></returns>
         private static bool CanBeLegallyPlacedAtLocation(int row, int column, int value)
         {
-            bool result = true;
-            
-            
             if (_valuesUsedInRow[row, value])
             {
-                result = false;
+                return false;
             }
             for (int i = 0; i < _numberOfRowsAndColumnsInPuzzle; i++)
             {
@@ -197,15 +179,15 @@ namespace Ksu.Cis300.SudokuSolver
                 {
                     if (i != row)
                     {
-                        result = false;
+                        return false;
                     }
                 }
             }
             if (_valuesUsedInBlock[row/_numberOfRowsAndColumnsInBlock, column/_numberOfRowsAndColumnsInBlock, value])
             {
-                result = false;
+                return false;
             }
-            return result;
+            return true;
         }
 
         /// <summary>
@@ -218,32 +200,21 @@ namespace Ksu.Cis300.SudokuSolver
             DoublyLinkedListCell EmptyHeader = new DoublyLinkedListCell();
             _emptyPuzzleLocations[row] = EmptyHeader;
             _unusedValues[row] = GetListOfAllPuzzleValues();
-
             for (int i = 0; i < _puzzle.GetLength(1); i++)
             {
                 if (_puzzle[row, i] == 0)
                 {
                     DoublyLinkedListCell temp = new DoublyLinkedListCell();
-                    temp.Data = i;//previously temp.Data = _puzzle[row][i];
+                    temp.Data = i;
                     InsertCellIntoList(temp, EmptyHeader);
                 }
                 else
                 {
-                    if (!(CanBeLegallyPlacedAtLocation(row, i, _puzzle[row, i]) || RemoveValueFromList(_puzzle[row, i], EmptyHeader)))
+                    if (!(CanBeLegallyPlacedAtLocation(row, i, _puzzle[row, i])))
                     {
                         return false;
                     }
                     RecordStatusOfValueInBoolArrays(row, i, _puzzle[row, i], true);
-                    /*
-                    if (!CanBeLegallyPlacedAtLocation(row, i, _puzzle[row, i]))
-                    {
-                        if (!RemoveValueFromList(_puzzle[row, i], EmptyHeader))
-                        {
-                            return false;
-                        }
-                    }
-                    RecordStatusOfValueInBoolArrays(row, i, _puzzle[row, i], true);
-                    */
                 }
             }
             return true;

@@ -45,7 +45,7 @@
             this.puzzleToolStripMenuItem});
             this.uxMenuStrip1.Location = new System.Drawing.Point(0, 0);
             this.uxMenuStrip1.Name = "uxMenuStrip1";
-            this.uxMenuStrip1.Size = new System.Drawing.Size(800, 36);
+            this.uxMenuStrip1.Size = new System.Drawing.Size(800, 33);
             this.uxMenuStrip1.TabIndex = 0;
             this.uxMenuStrip1.Text = "menuStrip1";
             // 
