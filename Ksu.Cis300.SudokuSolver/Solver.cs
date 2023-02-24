@@ -6,6 +6,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Drawing.Text;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -123,7 +124,7 @@ namespace Ksu.Cis300.SudokuSolver
             //this is wrong.
             */
             DoublyLinkedListCell header = new DoublyLinkedListCell();
-            for (int i = 1; i < _numberOfRowsAndColumnsInPuzzle; i++)
+            for (int i = 1; i <= _numberOfRowsAndColumnsInPuzzle; i++)
             {
                 DoublyLinkedListCell temp = new DoublyLinkedListCell();
                 temp.Data = i;
@@ -170,7 +171,7 @@ namespace Ksu.Cis300.SudokuSolver
         /// <param name="isPresent">Bool indicating whether the value is present.</param>
         private static void RecordStatusOfValueInBoolArrays(int row, int column, int value, bool isPresent)
         {
-            _valuesUsedInRow[row, column] = isPresent;
+            _valuesUsedInRow[row, value] = isPresent;
             _valuesUsedInBlock[row/_numberOfRowsAndColumnsInBlock, column/_numberOfRowsAndColumnsInBlock, value] = isPresent; //maybe check on this one later, could be wrong.
         }
 
@@ -179,16 +180,28 @@ namespace Ksu.Cis300.SudokuSolver
         /// </summary>
         /// <param name="row">Row in which the value is to be placed.</param>
         /// <param name="column">Column in which the value is to be placed.</param>
-        /// <param name="value">The value in questionl.</param>
+        /// <param name="value">The value in question.</param>
         /// <returns></returns>
         private static bool CanBeLegallyPlacedAtLocation(int row, int column, int value)
         {
             bool result = true;
-            if (_valuesUsedInRow[row, column])
+            
+            
+            if (_valuesUsedInRow[row, value])
             {
                 result = false;
             }
-            else if (_valuesUsedInBlock[row/_numberOfRowsAndColumnsInBlock, column/_numberOfRowsAndColumnsInBlock, value])
+            for (int i = 0; i < _numberOfRowsAndColumnsInPuzzle; i++)
+            {
+                if (_puzzle[i, column] == value)
+                {
+                    if (i != row)
+                    {
+                        result = false;
+                    }
+                }
+            }
+            if (_valuesUsedInBlock[row/_numberOfRowsAndColumnsInBlock, column/_numberOfRowsAndColumnsInBlock, value])
             {
                 result = false;
             }
@@ -211,7 +224,7 @@ namespace Ksu.Cis300.SudokuSolver
                 if (_puzzle[row, i] == 0)
                 {
                     DoublyLinkedListCell temp = new DoublyLinkedListCell();
-                    temp.Data = _puzzle[row, i];
+                    temp.Data = i;//previously temp.Data = _puzzle[row][i];
                     InsertCellIntoList(temp, EmptyHeader);
                 }
                 else
@@ -221,6 +234,16 @@ namespace Ksu.Cis300.SudokuSolver
                         return false;
                     }
                     RecordStatusOfValueInBoolArrays(row, i, _puzzle[row, i], true);
+                    /*
+                    if (!CanBeLegallyPlacedAtLocation(row, i, _puzzle[row, i]))
+                    {
+                        if (!RemoveValueFromList(_puzzle[row, i], EmptyHeader))
+                        {
+                            return false;
+                        }
+                    }
+                    RecordStatusOfValueInBoolArrays(row, i, _puzzle[row, i], true);
+                    */
                 }
             }
             return true;
@@ -255,7 +278,7 @@ namespace Ksu.Cis300.SudokuSolver
         /// Advances current row.
         /// </summary>
         /// <returns>Bool representing whether or not it successfully advanced.</returns>
-        private static bool AdvanceToNextRow() //needs fixing
+        private static bool AdvanceToNextRow()
         {
             _currentRow++;
             if (_currentRow >= _numberOfRowsAndColumnsInPuzzle) //advancing the current row field to the next row
@@ -285,7 +308,6 @@ namespace Ksu.Cis300.SudokuSolver
                     _currentLocation = _currentLocation.Previous;
                     DoublyLinkedListCell topCell = _cellsRemovedFromListsUnused.Pop();
                     _puzzle[_currentRow, _currentLocation.Data] = 0;
-                    //RemoveValueFromList(_currentLocation.Data, _currentLocation);
                     RecordStatusOfValueInBoolArrays(_currentRow, _currentLocation.Data, topCell.Data, false);
                     RestoreRemovedCell(topCell);
                     if (topCell != _unusedValues[_currentRow])

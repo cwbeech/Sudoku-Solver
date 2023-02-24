@@ -45,7 +45,7 @@
             this.puzzleToolStripMenuItem});
             this.uxMenuStrip1.Location = new System.Drawing.Point(0, 0);
             this.uxMenuStrip1.Name = "uxMenuStrip1";
-            this.uxMenuStrip1.Size = new System.Drawing.Size(800, 33);
+            this.uxMenuStrip1.Size = new System.Drawing.Size(800, 36);
             this.uxMenuStrip1.TabIndex = 0;
             this.uxMenuStrip1.Text = "menuStrip1";
             // 
@@ -56,7 +56,7 @@
             this.new9x9ToolStripMenuItem,
             this.solveToolStripMenuItem});
             this.puzzleToolStripMenuItem.Name = "puzzleToolStripMenuItem";
-            this.puzzleToolStripMenuItem.Size = new System.Drawing.Size(77, 29);
+            this.puzzleToolStripMenuItem.Size = new System.Drawing.Size(77, 30);
             this.puzzleToolStripMenuItem.Text = "Puzzle";
             // 
             // new4x4ToolStripMenuItem
@@ -97,13 +97,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.uxFlowLayoutPanel1);
             this.Controls.Add(this.uxMenuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MainMenuStrip = this.uxMenuStrip1;
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "UserInterface";
             this.Text = "Sudoku Solver";
             this.uxMenuStrip1.ResumeLayout(false);

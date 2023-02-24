@@ -224,6 +224,7 @@ namespace Ksu.Cis300.SudokuSolver
             {
                 PlaceSolutionInGUI();
                 solveToolStripMenuItem.Enabled = false;
+                uxFlowLayoutPanel1.Enabled = false;
             }
             else
             {
